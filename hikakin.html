@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>元気？</title>
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:#fff;
+}
+#start{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  cursor:pointer;
+  user-select:none;
+}
+#msg{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  align-items:center;
+  justify-content:center;
+  font-size:100px;
+  color:#000;
+}
+</style>
+</head>
+<body>
+
+<div id="start">押して起動</div>
+
+<!--下のdivタグに文字入れるとオンライン時にわかる-->
+<div id="msg" hidden>さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！</div>
+
+<audio id="sound"
+  src="https://sawaruna.mikann-server.f5.si/hikakin.mp4"
+  loop>
+</audio>
+
+<script>
+let armed=false
+let wentOffline=false;
+let started=false;
+
+const audio=document.getElementById("sound");
+const msg=document.getElementById("msg");
+
+function trigger(){
+  if(started)return;
+  started=true;
+  msg.hidden=false;
+  msg.style.display="flex";
+  audio.play();
+}
+
+start.onclick=()=>{
+  armed=true;
+  start.style.display="none";
+};
+
+addEventListener("offline",()=>{
+  if(armed) wentOffline=true;
+});
+
+addEventListener("online",()=>{
+  if(armed && wentOffline){
+    trigger();
+  }
+});
+</script>
+</body>
+</html>
