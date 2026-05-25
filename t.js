@@ -1,0 +1,1 @@
+javascript:(function(){var c=prompt("開くタブの数を入力してください","1");c=parseInt(c,10);if(isNaN(c)||c<=0){alert("正しい数値を入力しろ");return;}var u=confirm("今見てるサイトを開くか？（OKで開く）");var l="";if(u){l=location.href;}else{l=prompt("開くURLを入力しろ","https://");if(!l){alert("URLが空とかナメてんのか");return;}}for(var i=0;i<c;i++){window.open(l,'_blank');}})();
