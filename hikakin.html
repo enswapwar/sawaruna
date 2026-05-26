@@ -10,6 +10,7 @@ html,body{
   height:100%;
   background:#fff;
 }
+
 #start{
   position:fixed;
   inset:0;
@@ -20,6 +21,7 @@ html,body{
   cursor:pointer;
   user-select:none;
 }
+
 #msg{
   position:fixed;
   inset:0;
@@ -35,28 +37,45 @@ html,body{
 
 <div id="start">押して起動</div>
 
-<!--下のdivタグに文字入れるとオンライン時にわかる-->
-<div id="msg" hidden>さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！さわるな！</div>
+<div id="msg" hidden>
+さわるな！さわるな！さわるな！さわるな！さわるな！
+さわるな！さわるな！さわるな！さわるな！さわるな！
+さわるな！さわるな！さわるな！さわるな！さわるな！
+</div>
 
-<audio id="sound"
+<audio
+  id="sound"
   src="https://sawaruna.mikann-server.f5.si/hikakin.mp4"
   loop>
 </audio>
 
 <script>
-let armed=false
+let armed=false;
 let wentOffline=false;
 let started=false;
 
 const audio=document.getElementById("sound");
 const msg=document.getElementById("msg");
+const start=document.getElementById("start");
+
+function keepPlaying(){
+  if(!started)return;
+
+  if(audio.paused){
+    audio.play().catch(()=>{});
+  }
+}
 
 function trigger(){
   if(started)return;
   started=true;
+
   msg.hidden=false;
   msg.style.display="flex";
-  audio.play();
+
+  audio.play().catch(()=>{});
+
+  setInterval(keepPlaying,1000);
 }
 
 start.onclick=()=>{
@@ -65,7 +84,9 @@ start.onclick=()=>{
 };
 
 addEventListener("offline",()=>{
-  if(armed) wentOffline=true;
+  if(armed){
+    wentOffline=true;
+  }
 });
 
 addEventListener("online",()=>{
@@ -73,6 +94,27 @@ addEventListener("online",()=>{
     trigger();
   }
 });
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"){
+    keepPlaying();
+  }
+});
+
+window.addEventListener("focus",keepPlaying);
+
+let lastTime=Date.now();
+
+setInterval(()=>{
+  const now=Date.now();
+
+  if(now-lastTime>5000){
+    keepPlaying();
+  }
+
+  lastTime=now;
+},1000);
 </script>
+
 </body>
 </html>
