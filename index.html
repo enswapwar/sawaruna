@@ -39,12 +39,14 @@ html,body{
 
 <div id="msg" hidden>
 さわるな！さわるな！さわるな！さわるな！さわるな！
+さわるな！さわるな！さわるな！さわるな！さわるな！
+さわるな！さわるな！さわるな！さわるな！さわるな！
 </div>
 
 <audio
-id="sound"
-src="https://sawaruna.mikann-server.f5.si/コケコッコー爆音！.m4a"
-loop>
+  id="sound"
+  src="https://sawaruna.mikann-server.f5.si/コケコッコー爆音！.m4a"
+  loop>
 </audio>
 
 <script>
@@ -52,91 +54,9 @@ let armed=false;
 let wentOffline=false;
 let started=false;
 
-let selectedDeviceId=null;
-let cameraStream=null;
-
 const audio=document.getElementById("sound");
 const msg=document.getElementById("msg");
 const start=document.getElementById("start");
-
-async function setupCamera(){
-  await navigator.mediaDevices.getUserMedia({
-    video:true
-  });
-
-  const devices=await navigator.mediaDevices.enumerateDevices();
-  const cameras=devices.filter(
-    d=>d.kind==="videoinput"
-  );
-
-  if(!cameras.length){
-    return;
-  }
-
-  const names=cameras.map((c,i)=>
-    `${i}: ${c.label||("Camera "+i)}`
-  ).join("\n");
-
-  const index=parseInt(
-    prompt(
-      "使用するカメラ番号\n\n"+names,
-      "0"
-    ),
-    10
-  );
-
-  if(isNaN(index)||!cameras[index]){
-    return;
-  }
-
-  selectedDeviceId=cameras[index].deviceId;
-
-  cameraStream=
-  await navigator.mediaDevices.getUserMedia({
-    video:{
-      deviceId:{
-        exact:selectedDeviceId
-      }
-    }
-  });
-}
-
-async function takePhoto(){
-  if(!cameraStream) return;
-
-  const video=document.createElement("video");
-  video.srcObject=cameraStream;
-
-  await video.play();
-
-  const canvas=document.createElement("canvas");
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
-
-  canvas
-    .getContext("2d")
-    .drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-  const image=
-    canvas.toDataURL("image/png");
-
-  const a=document.createElement("a");
-  a.href=image;
-  a.download=
-    "camera_"+Date.now()+".png";
-
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  return image;
-}
 
 function keepPlaying(){
   if(!started)return;
@@ -148,7 +68,6 @@ function keepPlaying(){
 
 function trigger(){
   if(started)return;
-
   started=true;
 
   msg.hidden=false;
@@ -156,76 +75,40 @@ function trigger(){
 
   audio.play().catch(()=>{});
 
-  setInterval(
-    keepPlaying,
-    1000
-  );
+  setInterval(keepPlaying,1000);
 }
 
-start.onclick=async()=>{
+start.onclick=()=>{
   armed=true;
   start.style.display="none";
-
-  try{
-    await setupCamera();
-  }catch(e){
-    console.error(e);
-  }
 };
 
-addEventListener(
-  "offline",
-  ()=>{
-    if(armed){
-      wentOffline=true;
-    }
+addEventListener("offline",()=>{
+  if(armed){
+    wentOffline=true;
   }
-);
+});
 
-addEventListener(
-  "online",
-  async()=>{
-    if(
-      armed &&
-      wentOffline
-    ){
-
-      try{
-        await takePhoto();
-      }catch(e){
-        console.error(e);
-      }
-
-      trigger();
-    }
+addEventListener("online",()=>{
+  if(armed && wentOffline){
+    trigger();
   }
-);
+});
 
-document.addEventListener(
-  "visibilitychange",
-  ()=>{
-    if(
-      document.visibilityState
-      ==="visible"
-    ){
-      keepPlaying();
-    }
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"){
+    keepPlaying();
   }
-);
+});
 
-window.addEventListener(
-  "focus",
-  keepPlaying
-);
+window.addEventListener("focus",keepPlaying);
 
 let lastTime=Date.now();
 
 setInterval(()=>{
   const now=Date.now();
 
-  if(
-    now-lastTime>5000
-  ){
+  if(now-lastTime>5000){
     keepPlaying();
   }
 
