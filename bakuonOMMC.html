@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>元気？</title>
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:#fff;
+}
+
+#start{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  cursor:pointer;
+  user-select:none;
+}
+
+#msg{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  align-items:center;
+  justify-content:center;
+  font-size:100px;
+  color:#000;
+}
+</style>
+</head>
+<body>
+
+<div id="start">押して起動</div>
+
+<div id="msg" hidden>
+さわるな！さわるな！さわるな！さわるな！さわるな！
+さわるな！さわるな！さわるな！さわるな！さわるな！
+さわるな！さわるな！さわるな！さわるな！さわるな！
+</div>
+
+<audio
+  id="sound"
+  src="https://sawaruna.mikann-server.f5.si/爆音OMMC.mp4"
+  loop>
+</audio>
+
+<script>
+let armed=false;
+let wentOffline=false;
+let started=false;
+
+const audio=document.getElementById("sound");
+const msg=document.getElementById("msg");
+const start=document.getElementById("start");
+
+function keepPlaying(){
+  if(!started)return;
+
+  if(audio.paused){
+    audio.play().catch(()=>{});
+  }
+}
+
+function trigger(){
+  if(started)return;
+  started=true;
+
+  msg.hidden=false;
+  msg.style.display="flex";
+
+  audio.play().catch(()=>{});
+
+  setInterval(keepPlaying,1000);
+}
+
+start.onclick=()=>{
+  armed=true;
+  start.style.display="none";
+};
+
+addEventListener("offline",()=>{
+  if(armed){
+    wentOffline=true;
+  }
+});
+
+addEventListener("online",()=>{
+  if(armed && wentOffline){
+    trigger();
+  }
+});
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"){
+    keepPlaying();
+  }
+});
+
+window.addEventListener("focus",keepPlaying);
+
+let lastTime=Date.now();
+
+setInterval(()=>{
+  const now=Date.now();
+
+  if(now-lastTime>5000){
+    keepPlaying();
+  }
+
+  lastTime=now;
+},1000);
+</script>
+
+</body>
+</html>
